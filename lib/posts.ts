@@ -4,9 +4,17 @@ import matter from 'gray-matter';
 import { remark } from 'remark';
 import html from 'remark-html';
 
+// Types
+import {
+  PostMetadata,
+  MarkdownPostMetadata,
+  PathToPost,
+  PostData,
+} from '../types';
+
 const postsDirectory = path.join(process.cwd(), '_posts');
 
-export function getSortedPostsData() {
+export function getSortedPostsData(): PostMetadata[] {
   // Get filenames under /posts
   const fileNames = fs.readdirSync(postsDirectory);
 
@@ -27,7 +35,7 @@ export function getSortedPostsData() {
     // Combine the data with the id
     return {
       id,
-      ...matterResult.data,
+      ...(matterResult.data as MarkdownPostMetadata),
     };
   });
 
@@ -49,7 +57,7 @@ export function getSortedPostsData() {
 }
 
 // For generating dynamic routes to a single post
-export function getAllPostIds() {
+export function getAllPostIds(): PathToPost[] {
   const fileNames = fs.readdirSync(postsDirectory);
 
   /**
@@ -64,7 +72,7 @@ export function getAllPostIds() {
   }));
 }
 
-export async function getPostData(id) {
+export async function getPostData(id: string): Promise<PostData> {
   const fullPath = path.join(postsDirectory, `${id}.md`);
   const fileContents = fs.readFileSync(fullPath, 'utf8');
 
@@ -81,6 +89,6 @@ export async function getPostData(id) {
   return {
     id,
     content: htmlContent,
-    ...matterResult.data,
+    ...(matterResult.data as MarkdownPostMetadata),
   };
 }
